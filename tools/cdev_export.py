@@ -9,7 +9,7 @@ import tempfile
 import Sybase
 
 
-CAD_HOST = "acnlina"
+CAD_HOST = "acnlina5.pbn.bnl.gov"
 CAD_SDDS_BASE = "/operations/app_store/RunData/run_fy13"
 CAD_LOGREQ_BASE = "/operations/app_store/Gpm"
 OUTPUT_DIR = "./run_fy13"
