@@ -1,0 +1,73 @@
+/* vim: set sw=3: */
+
+#include <sqlite3.h>
+
+#include "SqliteDriver.h"
+
+namespace opencdev {
+
+SqliteDriver::SqliteDriver(const string &db_file)
+{
+   if (sqlite3_open_v2(db_file.c_str(), &fDB, SQLITE_OPEN_READONLY, NULL) != SQLITE_OK)
+   {
+      throw "Cannot open sqlite3 database";
+   }
+   int ret;
+   // TODO: Check if we should use stopFillNo as well
+   char fill_metadata_query[] = "SELECT filePath FROM rhicFileHeaderV WHERE requestFile = ? AND fillNo = ?;";
+   ret = sqlite3_prepare_v2(fDB, fill_metadata_query, sizeof(fill_metadata_query), &fFillMetadataQueryStmt, NULL);
+   if (ret != SQLITE_OK)
+   {
+      throw "Cannot prepare sql";
+   }
+   char timerange_metadata_query[] = "SELECT filePath FROM rhicFileHeaderV WHERE requestFile = ? AND timeStamp <= datetime(?, 'unixepoch') AND ((stopTimeStamp = NULL) OR (stopTimeStamp >= datetime(?, 'unixepoch'))) ORDER BY timeStamp;";
+   ret = sqlite3_prepare_v2(fDB, timerange_metadata_query, sizeof(timerange_metadata_query), &fTimeRangeMetadataQueryStmt, NULL);
+   if (ret != SQLITE_OK)
+   {
+      throw "Cannot prepare sql";
+   }
+}
+
+vector<string> SqliteDriver::get_file_list(sqlite3_stmt *stmt)
+{
+   vector<string> result;
+
+   int ret;
+   do
+   {
+      ret = sqlite3_step(stmt);
+      if (ret == SQLITE_ROW)
+      {
+         result.push_back((const char*)sqlite3_column_text(stmt, 0));
+      }
+      else if (ret != SQLITE_DONE)
+      {
+         throw sqlite3_errmsg(fDB);
+      }
+   }
+   while (ret != SQLITE_DONE);
+
+   return result;
+}
+
+vector<string> SqliteDriver::get_fill_files(const string &logreq_path, int fill_id)
+{
+   sqlite3_reset(fFillMetadataQueryStmt);
+   sqlite3_bind_text(fFillMetadataQueryStmt, 1, logreq_path.c_str(), logreq_path.size(), SQLITE_STATIC);
+   sqlite3_bind_int(fFillMetadataQueryStmt, 2, fill_id);
+
+   return get_file_list(fFillMetadataQueryStmt);
+}
+
+vector<string> SqliteDriver::get_timerange_files(const string &logreq_path, int64_t starttime, int64_t endtime)
+{
+   sqlite3_reset(fTimeRangeMetadataQueryStmt);
+   sqlite3_bind_text(fTimeRangeMetadataQueryStmt, 1, logreq_path.c_str(), logreq_path.size(), SQLITE_STATIC);
+   sqlite3_bind_int64(fTimeRangeMetadataQueryStmt, 2, endtime);
+   sqlite3_bind_int64(fTimeRangeMetadataQueryStmt, 3, starttime);
+
+   return get_file_list(fTimeRangeMetadataQueryStmt);
+}
+
+
+}

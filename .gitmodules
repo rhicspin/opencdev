@@ -1,0 +1,3 @@
+[submodule "contrib/epics-sdds"]
+	path = contrib/epics-sdds
+	url = git://github.com/veprbl/epics-sdds.git
