@@ -18,8 +18,8 @@ class SqliteDriver
 {
    private:
 
-      sqlite3           *fDB;
-      sqlite3_stmt      *fFillMetadataQueryStmt, *fTimeRangeMetadataQueryStmt;
+      sqlite3           *_db;
+      sqlite3_stmt      *_fill_query_stmt, *_timerange_query_stmt;
 
       vector<string>    get_file_list(sqlite3_stmt *stmt);
 
