@@ -26,6 +26,7 @@ class SqliteDriver
    public:
 
       SqliteDriver(const string &db_file);
+      ~SqliteDriver();
       vector<string>    get_fill_files(const string &logreq_path, int fill_id);
       vector<string>    get_timerange_files(const string &logreq_path, int64_t starttime, int64_t endtime);
 };

@@ -28,6 +28,11 @@ SqliteDriver::SqliteDriver(const string &db_file)
    }
 }
 
+SqliteDriver::~SqliteDriver()
+{
+   sqlite3_close(_db);
+}
+
 vector<string> SqliteDriver::get_file_list(sqlite3_stmt *stmt)
 {
    vector<string> result;
