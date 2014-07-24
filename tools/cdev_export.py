@@ -21,6 +21,7 @@ def fetch(conn, logreq):
     cur = conn.cursor()
     logreq_full = os.path.join(CAD_LOGREQ_BASE, logreq)
     #cur.execute("SELECT * FROM rhicFileHeaderV WHERE requestFile = @name", {'@name': logreq_full})
+    assert(logreq_full.find("'") == -1)
     cur.execute("SELECT * FROM rhicFileHeaderV WHERE requestFile = '%s'" % logreq_full)
     res = cur.fetchall()
     field_list = map(lambda x: x[0], cur.description)

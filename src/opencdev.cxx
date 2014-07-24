@@ -63,12 +63,16 @@ void    DB::read_sdds_file(const string &filepath, result_t *result, int64_t sta
 
       for(int32_t row = 0; row < row_count; row++)
       {
-         double value = values[row];
-         if (value == hole_value)
+         cdev_time_t row_time = time[row];
+         if (((starttime == 0) && (endtime == 0)) || ((starttime < row_time) && (endtime > row_time)))
          {
-            continue;
+            double value = values[row];
+            if (value == hole_value)
+            {
+               continue;
+            }
+            col_result[row_time + file_starttime] = value;
          }
-         col_result[time[row] + file_starttime] = value;
       }
    }
 }
