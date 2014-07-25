@@ -1,8 +1,7 @@
 language: cpp
 before_script:
-  - sudo ./.raring-pinning.sh
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libboost1.49-dev libboost-filesystem1.49-dev libboost-test1.49-dev
+  - sudo apt-get install -qq libboost-dev libboost-filesystem-dev libboost-test-dev
   - mkdir build
   - cd build
   - cmake ..
