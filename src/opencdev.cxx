@@ -36,7 +36,7 @@ cdev_time_t    DB::from_utc(cdev_time_t utc_time)
    const double ticks_per_second =
       boost::posix_time::time_duration::rep_type::ticks_per_second;
    // Define time zone
-   static time_zone_ptr ny_tz(new posix_time_zone("EST-5EDT,M4.1.0,M10.5.0"));
+   static time_zone_ptr ny_tz(new posix_time_zone("EST-5EDT,M3.2.0,M11.1.0"));
    // Convert from UNIX time
    static ptime unix_epoch(boost::gregorian::date(1970,1,1));
    time_duration dt(0, 0, 0, ticks_per_second * utc_time);
