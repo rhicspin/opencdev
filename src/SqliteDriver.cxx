@@ -14,13 +14,13 @@ SqliteDriver::SqliteDriver(const string &db_file)
    }
    int ret;
    // TODO: Check if we should use stopFillNo as well
-   char fill_metadata_query[] = "SELECT filePath FROM rhicFileHeaderV WHERE requestFile = ? AND fillNo = ?;";
+   char fill_metadata_query[] = "SELECT filePath, strftime('%s', timeStamp) FROM rhicFileHeaderV WHERE requestFile = ? AND fillNo = ?;";
    ret = sqlite3_prepare_v2(_db, fill_metadata_query, sizeof(fill_metadata_query), &_fill_query_stmt, NULL);
    if (ret != SQLITE_OK)
    {
       throw "Cannot prepare sql";
    }
-   char timerange_metadata_query[] = "SELECT filePath FROM rhicFileHeaderV WHERE requestFile = ? AND timeStamp <= datetime(?, 'unixepoch') AND ((stopTimeStamp = NULL) OR (stopTimeStamp >= datetime(?, 'unixepoch'))) ORDER BY timeStamp;";
+   char timerange_metadata_query[] = "SELECT filePath, strftime('%s', timeStamp) FROM rhicFileHeaderV WHERE requestFile = ? AND timeStamp <= datetime(?, 'unixepoch') AND ((stopTimeStamp = NULL) OR (stopTimeStamp >= datetime(?, 'unixepoch'))) ORDER BY timeStamp;";
    ret = sqlite3_prepare_v2(_db, timerange_metadata_query, sizeof(timerange_metadata_query), &_timerange_query_stmt, NULL);
    if (ret != SQLITE_OK)
    {
@@ -33,9 +33,9 @@ SqliteDriver::~SqliteDriver()
    sqlite3_close(_db);
 }
 
-vector<string> SqliteDriver::get_file_list(sqlite3_stmt *stmt)
+vector<file_rec_t> SqliteDriver::get_file_list(sqlite3_stmt *stmt)
 {
-   vector<string> result;
+   vector<file_rec_t> result;
 
    int ret;
    do
@@ -43,7 +43,10 @@ vector<string> SqliteDriver::get_file_list(sqlite3_stmt *stmt)
       ret = sqlite3_step(stmt);
       if (ret == SQLITE_ROW)
       {
-         result.push_back((const char*)sqlite3_column_text(stmt, 0));
+         result.push_back(file_rec_t({
+               (const char*)sqlite3_column_text(stmt, 0),
+               sqlite3_column_int64(stmt, 1)
+               }));
       }
       else if (ret != SQLITE_DONE)
       {
@@ -55,7 +58,7 @@ vector<string> SqliteDriver::get_file_list(sqlite3_stmt *stmt)
    return result;
 }
 
-vector<string> SqliteDriver::get_fill_files(const string &logreq_path, int fill_id)
+vector<file_rec_t> SqliteDriver::get_fill_files(const string &logreq_path, int fill_id)
 {
    sqlite3_reset(_fill_query_stmt);
    sqlite3_bind_text(_fill_query_stmt, 1, logreq_path.c_str(), logreq_path.size(), SQLITE_STATIC);
@@ -64,7 +67,7 @@ vector<string> SqliteDriver::get_fill_files(const string &logreq_path, int fill_
    return get_file_list(_fill_query_stmt);
 }
 
-vector<string> SqliteDriver::get_timerange_files(const string &logreq_path, int64_t starttime, int64_t endtime)
+vector<file_rec_t> SqliteDriver::get_timerange_files(const string &logreq_path, int64_t starttime, int64_t endtime)
 {
    sqlite3_reset(_timerange_query_stmt);
    sqlite3_bind_text(_timerange_query_stmt, 1, logreq_path.c_str(), logreq_path.size(), SQLITE_STATIC);

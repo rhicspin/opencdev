@@ -31,8 +31,8 @@ private:
    string get_logreq_path(const string &logger);
    string get_sdds_path(const string &rel_path);
    cdev_time_t from_utc(cdev_time_t time);
-   void   read_sdds_files(const vector<string> &files, result_t *result, int64_t starttime, int64_t endtime);
-   void   read_sdds_file(const string &filepath, result_t *result, int64_t starttime, int64_t endtime);
+   void   read_sdds_files(const vector<file_rec_t> &files, result_t *result, int64_t starttime, int64_t endtime);
+   void   read_sdds_file(const file_rec_t &file, result_t *result, int64_t starttime, int64_t endtime);
 
 public:
 
