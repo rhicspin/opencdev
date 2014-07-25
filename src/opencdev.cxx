@@ -72,12 +72,12 @@ void    DB::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t
    assert(f.pageCount() == 1);
    assert(f.getColumnIndex(const_cast<char*>("Time")) == 0);
    const int32_t page_id = 1;
-   const cdev_time_t file_starttime = from_utc(f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id));
+   const cdev_time_t file_starttime = f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id);
    const double hole_value = f.getParameterInDouble(const_cast<char*>("HoleValue"), page_id);
    const int32_t column_count = f.getColumnCount();
    const int32_t row_count = f.rowCount(page_id);
    double *time = f.getColumnInDouble(0, page_id);
-   if (fabs(file_starttime - file.timestamp) > 60*30)
+   if (fabs(from_utc(file_starttime) - file.timestamp) > 60*30)
    {
       throw "Inconsistent FileStartTime. Wrong time zone?";
    }
@@ -88,7 +88,7 @@ void    DB::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t
 
       for(int32_t row = 0; row < row_count; row++)
       {
-         cdev_time_t row_time = time[row] + file_starttime;
+         cdev_time_t row_time = from_utc(time[row] + file_starttime);
          if (((starttime == 0) && (endtime == 0)) || ((starttime <= row_time) && (endtime >= row_time)))
          {
             double value = values[row];
