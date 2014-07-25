@@ -21,7 +21,7 @@ string  DB::get_sdds_path(const string &rel_path)
    return (fs::path(_base_path)/fs::path(rel_path)).string();
 }
 
-void    DB::read_sdds_files(const vector<file_rec_t> &files, result_t *result, int64_t starttime, int64_t endtime)
+void    DB::read_sdds_files(const vector<file_rec_t> &files, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
 {
    for(vector<file_rec_t>::const_iterator it = files.begin(); it != files.end(); it++)
    {
@@ -48,7 +48,7 @@ cdev_time_t    DB::from_utc(cdev_time_t utc_time)
    return (ny_ptime - unix_epoch).ticks() / ticks_per_second;
 }
 
-void    DB::read_sdds_file(const file_rec_t &file, result_t *result, int64_t starttime, int64_t endtime)
+void    DB::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
 {
    const string &orig_path = file.path;
    if (orig_path.find(CAD_SDDS_BASE) != 0)
@@ -72,7 +72,7 @@ void    DB::read_sdds_file(const file_rec_t &file, result_t *result, int64_t sta
    assert(f.pageCount() == 1);
    assert(f.getColumnIndex(const_cast<char*>("Time")) == 0);
    const int32_t page_id = 1;
-   const int64_t file_starttime = from_utc(f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id));
+   const cdev_time_t file_starttime = from_utc(f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id));
    const double hole_value = f.getParameterInDouble(const_cast<char*>("HoleValue"), page_id);
    const int32_t column_count = f.getColumnCount();
    const int32_t row_count = f.rowCount(page_id);
@@ -116,7 +116,7 @@ void    DB::query_fill(const string &logger, int fill_id, result_t *result)
    read_sdds_files(files, result, 0, 0);
 }
 
-void    DB::query_timerange(const string &logger, int64_t starttime, int64_t endtime, result_t *result)
+void    DB::query_timerange(const string &logger, cdev_time_t starttime, cdev_time_t endtime, result_t *result)
 {
    vector<file_rec_t> files = _db.get_timerange_files(get_logreq_path(logger), starttime, endtime);
 
