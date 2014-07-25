@@ -1,6 +1,7 @@
 /* vim: set sw=3: */
 
 #include <boost/filesystem.hpp>
+#include <boost/date_time/local_time/local_time.hpp>
 #include <SDDS3.h>
 
 #include "opencdev.h"
@@ -34,6 +35,25 @@ void    DB::read_sdds_files(const vector<string> &files, result_t *result, int64
    }
 }
 
+cdev_time_t    DB::from_utc(cdev_time_t utc_time)
+{
+   using namespace boost::local_time;
+   using namespace boost::posix_time;
+   const double ticks_per_second =
+      boost::posix_time::time_duration::rep_type::ticks_per_second;
+   // Define time zone
+   time_zone_ptr ny_tz(new posix_time_zone("EST-5EDT,M4.1.0,M10.5.0"));
+   // Convert from UNIX time
+   ptime unix_epoch(boost::gregorian::date(1970,1,1));
+   time_duration dt(0, 0, 0, ticks_per_second * utc_time);
+   ptime utc_ptime = unix_epoch + dt;
+   // Convert to NY time zone
+   local_date_time ny_time(utc_ptime, ny_tz);
+   // Convert to UNIX time
+   ptime ny_ptime = ny_time.local_time();
+   return (ny_ptime - unix_epoch).ticks() / ticks_per_second;
+}
+
 void    DB::read_sdds_file(const string &filepath, result_t *result, int64_t starttime, int64_t endtime)
 {
    if (!fs::exists(filepath))
@@ -63,15 +83,15 @@ void    DB::read_sdds_file(const string &filepath, result_t *result, int64_t sta
 
       for(int32_t row = 0; row < row_count; row++)
       {
-         cdev_time_t row_time = time[row];
-         if (((starttime == 0) && (endtime == 0)) || ((starttime < row_time) && (endtime > row_time)))
+         cdev_time_t row_time = from_utc(time[row] + file_starttime);
+         if (((starttime == 0) && (endtime == 0)) || ((starttime <= row_time) && (endtime >= row_time)))
          {
             double value = values[row];
             if (value == hole_value)
             {
                continue;
             }
-            col_result[row_time + file_starttime] = value;
+            col_result[row_time] = value;
          }
       }
    }
