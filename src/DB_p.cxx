@@ -53,6 +53,36 @@ cdev_time_t    DBPrivate::from_utc(cdev_time_t utc_time)
    return (ny_ptime - unix_epoch).ticks() / ticks_per_second;
 }
 
+/**
+ * Make map from value to it's corresponding measurement time.
+ *
+ * For, example, bi12-pol3.1-det1.i:currentM maps to a bi12-pol3.1-det1.i:currentMT column
+ *
+ * This should work when sddsIOFileType == "SDDSIO_LOG_VTf"
+ */
+vector<int>    DBPrivate::make_time_column_map(SDDSFile &f)
+{
+   const int32_t column_count = f.getColumnCount();
+   vector<int> result;
+   result.resize(column_count);
+
+   for(int32_t col = 1; col < column_count; col++) // start at 1 to skip time column
+   {
+      string col_name = f.getColumnName(col);
+      if (col_name[col_name.size()-1] == 'T')
+      {
+         string col_units = f.getColumnUnits(col);
+         assert(col_units == "seconds");
+         result[col] = -1;
+         continue;
+      }
+      string time_col_name = col_name + "T";
+      result[col] = f.getColumnIndex(const_cast<char*>(time_col_name.c_str()));
+   }
+
+   return result;
+}
+
 void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
 {
    const string &orig_path = file.path;
@@ -77,17 +107,31 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
    assert(f.pageCount() == 1);
    assert(f.getColumnIndex(const_cast<char*>("Time")) == 0);
    const int32_t page_id = 1;
+
+   if (string(f.getParameterInString(const_cast<char*>("sddsIOFileType"), page_id)) != "SDDSIO_LOG_VTf")
+   {
+      throw "Unsupported log type";
+   }
+
    const cdev_time_t file_starttime = f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id);
    const double hole_value = f.getParameterInDouble(const_cast<char*>("HoleValue"), page_id);
    const int32_t column_count = f.getColumnCount();
    const int32_t row_count = f.rowCount(page_id);
-   double *time = f.getColumnInDouble(0, page_id);
    if (fabs(from_utc(file_starttime) - file.timestamp) > 60*30)
    {
       throw "Inconsistent FileStartTime. Wrong time zone?";
    }
-   for(int32_t col = 1; col < column_count; col++)
+
+   vector<int> time_col_map = make_time_column_map(f);
+
+   for(int32_t col = 1; col < column_count; col++) // start at 1 to skip time column
    {
+      int32_t time_col_index = time_col_map[col];
+      if (time_col_index < 0)
+      {
+         continue;
+      }
+      double *time = f.getColumnInDouble(time_col_index, page_id);
       double *values = f.getColumnInDouble(col, page_id);
       map<cdev_time_t, double> &col_result = (*result)[f.getColumnName(col)];
 
