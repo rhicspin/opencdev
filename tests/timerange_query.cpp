@@ -1,9 +1,14 @@
 /* vim: set sw=3: */
 
+#include <string>
+#include <map>
+
 #include <boost/test/unit_test.hpp>
 #include "boost/date_time/posix_time/posix_time_types.hpp"
 
 #include <opencdev.h>
+
+using namespace std;
 
 BOOST_AUTO_TEST_SUITE(timerange_query)
 

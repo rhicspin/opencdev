@@ -4,9 +4,11 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <map>
 
 #include <opencdev.h>
 
+using std::map;
 using std::string;
 using std::cout;
 using std::endl;

@@ -5,6 +5,7 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} ${OPENCDEV_INCLUDE_DIR})
 ADD_EXECUTABLE(
 	unit_tests
 	unit_tests_main.cpp
+	copy.cpp
 	timerange_query.cpp
 	)
 
@@ -16,6 +17,10 @@ TARGET_LINK_LIBRARIES(
 	opencdev
 	)
 
+ADD_TEST(
+	NAME copy
+	COMMAND $<TARGET_FILE:unit_tests> --run_test=copy
+	)
 ADD_TEST(
 	NAME timerange_query
 	COMMAND $<TARGET_FILE:unit_tests> --run_test=timerange_query

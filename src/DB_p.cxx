@@ -1,27 +1,32 @@
 /* vim: set sw=3: */
 
+#include <map>
+
 #include <boost/filesystem.hpp>
 #include <boost/date_time/local_time/local_time.hpp>
 #include <SDDS3.h>
 
 #include "opencdev.h"
+#include "DB_p.h"
 #include "SqliteDriver.h"
+
+using std::map;
 
 namespace fs = boost::filesystem;
 
 namespace opencdev {
 
-string  DB::get_logreq_path(const string &logger)
+string  DBPrivate::get_logreq_path(const string &logger)
 {
    return (fs::path(CAD_LOGREQ_BASE)/fs::path(logger)).string();
 }
 
-string  DB::get_sdds_path(const string &rel_path)
+string  DBPrivate::get_sdds_path(const string &rel_path)
 {
    return (fs::path(_base_path)/fs::path(rel_path)).string();
 }
 
-void    DB::read_sdds_files(const vector<file_rec_t> &files, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
+void    DBPrivate::read_sdds_files(const vector<file_rec_t> &files, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
 {
    for(vector<file_rec_t>::const_iterator it = files.begin(); it != files.end(); it++)
    {
@@ -29,7 +34,7 @@ void    DB::read_sdds_files(const vector<file_rec_t> &files, result_t *result, c
    }
 }
 
-cdev_time_t    DB::from_utc(cdev_time_t utc_time)
+cdev_time_t    DBPrivate::from_utc(cdev_time_t utc_time)
 {
    using namespace boost::local_time;
    using namespace boost::posix_time;
@@ -48,7 +53,7 @@ cdev_time_t    DB::from_utc(cdev_time_t utc_time)
    return (ny_ptime - unix_epoch).ticks() / ticks_per_second;
 }
 
-void    DB::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
+void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
 {
    const string &orig_path = file.path;
    if (orig_path.find(CAD_SDDS_BASE) != 0)
@@ -102,21 +107,21 @@ void    DB::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t
    }
 }
 
-DB::DB(const string &base_path)
+DBPrivate::DBPrivate(const string &base_path)
    : _base_path(base_path)
    , _db((fs::path(_base_path)/"db.sqlite").string())
 {
    // Nothing
 }
 
-void    DB::query_fill(const string &logger, int fill_id, result_t *result)
+void    DBPrivate::query_fill(const string &logger, int fill_id, result_t *result)
 {
    vector<file_rec_t> files = _db.get_fill_files(get_logreq_path(logger), fill_id);
    
    read_sdds_files(files, result, 0, 0);
 }
 
-void    DB::query_timerange(const string &logger, cdev_time_t starttime, cdev_time_t endtime, result_t *result)
+void    DBPrivate::query_timerange(const string &logger, cdev_time_t starttime, cdev_time_t endtime, result_t *result)
 {
    vector<file_rec_t> files = _db.get_timerange_files(get_logreq_path(logger), starttime, endtime);
 
