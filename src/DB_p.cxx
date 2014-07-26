@@ -73,11 +73,20 @@ vector<int>    DBPrivate::make_time_column_map(SDDSFile &f)
       {
          string col_units = f.getColumnUnits(col);
          assert(col_units == "seconds");
-         result[col] = -1;
+         result[col] = -1; // mark column for skipping
          continue;
       }
       string time_col_name = col_name + "T";
-      result[col] = f.getColumnIndex(const_cast<char*>(time_col_name.c_str()));
+      int col_id = f.getColumnIndex(const_cast<char*>(time_col_name.c_str()));
+      if (col_id >= 0)
+      {
+         result[col] = col_id;
+      }
+      else
+      {
+         // use recorded time column by default
+         result[col] = 0;
+      }
    }
 
    return result;
@@ -107,11 +116,6 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
    assert(f.pageCount() == 1);
    assert(f.getColumnIndex(const_cast<char*>("Time")) == 0);
    const int32_t page_id = 1;
-
-   if (string(f.getParameterInString(const_cast<char*>("sddsIOFileType"), page_id)) != "SDDSIO_LOG_VTf")
-   {
-      throw "Unsupported log type";
-   }
 
    const cdev_time_t file_starttime = f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id);
    const double hole_value = f.getParameterInDouble(const_cast<char*>("HoleValue"), page_id);
