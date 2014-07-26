@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "opencdev.h"
+
 namespace opencdev {
 
 class DBPrivate;
@@ -13,6 +15,7 @@ class DB
 private:
 
    DBPrivate* d;
+
 public:
 
    DB(const std::string &base_path);
