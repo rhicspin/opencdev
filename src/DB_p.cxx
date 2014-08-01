@@ -34,7 +34,7 @@ void    DBPrivate::read_sdds_files(const vector<file_rec_t> &files, result_t *re
    }
 }
 
-cdev_time_t    DBPrivate::from_utc(cdev_time_t utc_time)
+cdev_time_t    DBPrivate::to_utc(cdev_time_t ny_time)
 {
    using namespace boost::local_time;
    using namespace boost::posix_time;
@@ -44,13 +44,14 @@ cdev_time_t    DBPrivate::from_utc(cdev_time_t utc_time)
    static time_zone_ptr ny_tz(new posix_time_zone("EST-5EDT,M3.2.0,M11.1.0"));
    // Convert from UNIX time
    static ptime unix_epoch(boost::gregorian::date(1970,1,1));
-   time_duration dt(0, 0, 0, ticks_per_second * utc_time);
-   ptime utc_ptime = unix_epoch + dt;
+   time_duration dt(0, 0, 0, ticks_per_second * ny_time);
+   ptime ny_ptime = unix_epoch + dt;
    // Convert to NY time zone
-   local_date_time ny_time(utc_ptime, ny_tz);
+   local_date_time date_time(ny_ptime.date(), ny_ptime.time_of_day(), ny_tz,
+         local_date_time::EXCEPTION_ON_ERROR);
    // Convert to UNIX time
-   ptime ny_ptime = ny_time.local_time();
-   return (ny_ptime - unix_epoch).ticks() / ticks_per_second;
+   ptime utc_ptime = date_time.utc_time();
+   return (utc_ptime - unix_epoch).ticks() / ticks_per_second;
 }
 
 /**
@@ -118,10 +119,12 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
    const int32_t page_id = 1;
 
    const cdev_time_t file_starttime = f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id);
+   const double utc_starttime = to_utc(starttime);
+   const double utc_endtime = to_utc(endtime);
    const double hole_value = f.getParameterInDouble(const_cast<char*>("HoleValue"), page_id);
    const int32_t column_count = f.getColumnCount();
    const int32_t row_count = f.rowCount(page_id);
-   if (fabs(from_utc(file_starttime) - file.timestamp) > 60*30)
+   if (fabs(file_starttime - to_utc(file.timestamp)) > 60*30)
    {
       throw "Inconsistent FileStartTime. Wrong time zone?";
    }
@@ -141,8 +144,8 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
 
       for(int32_t row = 0; row < row_count; row++)
       {
-         cdev_time_t row_time = from_utc(time[row] + file_starttime);
-         if (((starttime == 0) && (endtime == 0)) || ((starttime <= row_time) && (endtime >= row_time)))
+         cdev_time_t row_time = time[row] + file_starttime;
+         if (((starttime == 0) && (endtime == 0)) || ((utc_starttime <= row_time) && (utc_endtime >= row_time)))
          {
             double value = values[row];
             if (value == hole_value)

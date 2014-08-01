@@ -45,8 +45,6 @@ BOOST_AUTO_TEST_CASE(check_load)
     */
    const int reference_size = 12;
    const double reference_time = 1362921351.449;
-   /* exportLoggerData outputs timestamps in utc, so we need a correction */
-   const double time_correction = -4 * 3600;
    const char* reference_names[reference_size] =
    {
       "yo12-pol3.1-det1.i:currentM",
@@ -81,7 +79,7 @@ BOOST_AUTO_TEST_CASE(check_load)
       const opencdev::cdev_time_t time = values.begin()->first;
       const double value = values.begin()->second;
 
-      BOOST_CHECK(fabs(time - (reference_time + time_correction)) < epsilon);
+      BOOST_CHECK(fabs(time - reference_time) < epsilon);
 
       int cell_id = -1;
       for(int i = 0; i < reference_size; i++)
