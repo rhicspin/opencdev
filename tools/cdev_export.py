@@ -48,6 +48,8 @@ def fetch(conn, logreq):
             def show(val):
                 if isinstance(val, datetime.datetime):
                     return "'%s'" % val.isoformat(" ")
+                if val is None:
+                    return "NULL"
                 else:
                     return repr(val)
             values = ", ".join(map(show, row))
