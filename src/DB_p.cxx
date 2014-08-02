@@ -1,9 +1,9 @@
 /* vim: set sw=3: */
 
 #include <map>
+#include <cmath>
 
 #include <boost/filesystem.hpp>
-#include <boost/date_time/local_time/local_time.hpp>
 #include <SDDS3.h>
 
 #include "opencdev.h"
