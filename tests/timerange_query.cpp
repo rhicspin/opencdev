@@ -43,9 +43,9 @@ BOOST_AUTO_TEST_CASE(check_load)
     *  -timeformat 'unix' -showmissingdatawith x \
     *  -start 'Sun Mar 10 09:15:00 2013' -stop 'Sun Mar 10 09:16:00 2013'
     */
-   const int reference_size = 12;
+   const int reference_column_count = 12;
    const double reference_time = 1362921351.449;
-   const char* reference_names[reference_size] =
+   const char* reference_names[reference_column_count] =
    {
       "yo12-pol3.1-det1.i:currentM",
       "yo12-pol3.1-det2.i:currentM",
@@ -60,14 +60,14 @@ BOOST_AUTO_TEST_CASE(check_load)
       "yo12-pol3.2-det5.i:currentM",
       "yo12-pol3.2-det6.i:currentM"
    };
-   const double reference_values[reference_size] =
+   const double reference_values[reference_column_count] =
    {
       -2.7354, -3.62058, -2.63866, -7.04316, -10.6212, -1.91041,
       -0.890352, -14.0294, -9.13237, -10.9491, -18.9445, -6.80427
    };
    const double epsilon = 0.001;
 
-   BOOST_CHECK(result.size() == reference_size);
+   BOOST_CHECK(result.size() == reference_column_count);
 
    for(opencdev::result_t::const_iterator it = result.begin(); it != result.end(); it++)
    {
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(check_load)
       BOOST_CHECK(fabs(time - reference_time) < epsilon);
 
       int cell_id = -1;
-      for(int i = 0; i < reference_size; i++)
+      for(int i = 0; i < reference_column_count; i++)
       {
          if (cell_name == reference_names[i])
          {
