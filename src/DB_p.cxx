@@ -1,10 +1,13 @@
 /* vim: set sw=3: */
 
 #include <map>
+#include <cstring>
 #include <cmath>
 
+#include <boost/scoped_array.hpp>
 #include <boost/filesystem.hpp>
-#include <SDDS3.h>
+
+#include <SDDS.h>
 
 #include "opencdev.h"
 #include "DB_p.h"
@@ -41,24 +44,22 @@ void    DBPrivate::read_sdds_files(const vector<file_rec_t> &files, result_t *re
  *
  * This should work when sddsIOFileType == "SDDSIO_LOG_VTf"
  */
-vector<int>    DBPrivate::make_time_column_map(SDDSFile &f)
+vector<int>    DBPrivate::make_time_column_map(char **col_name_arr, SDDS_DATASET *SDDS_dataset_ptr)
 {
-   const int32_t column_count = f.getColumnCount();
+   const int32_t column_count = SDDS_ColumnCount(SDDS_dataset_ptr);
    vector<int> result;
    result.resize(column_count);
 
    for(int32_t col = 1; col < column_count; col++) // start at 1 to skip time column
    {
-      string col_name = f.getColumnName(col);
+      string col_name = col_name_arr[col];
       if (col_name[col_name.size()-1] == 'T')
       {
-         string col_units = f.getColumnUnits(col);
-         assert(col_units == "seconds");
          result[col] = -1; // mark column for skipping
          continue;
       }
       string time_col_name = col_name + "T";
-      int col_id = f.getColumnIndex(const_cast<char*>(time_col_name.c_str()));
+      int col_id = SDDS_GetColumnIndex(SDDS_dataset_ptr, const_cast<char*>(time_col_name.c_str()));
       if (col_id >= 0)
       {
          result[col] = col_id;
@@ -86,28 +87,34 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
    {
       throw "File not found";
    }
-   SDDSFile f(const_cast<char*>(filepath.c_str()));
-   f.gzipFile = true;
-   if (f.readFile() != 0)
+
+   SDDS_DATASET SDDS_dataset;
+   int32_t ret = SDDS_InitializeInput(&SDDS_dataset, const_cast<char*>(filepath.c_str()));
+   if (!ret)
    {
-      f.printErrors();
+      SDDS_PrintErrors(stderr, 1);
       throw "Error reading SDDS file";
    }
 
-   assert(f.pageCount() == 1);
-   assert(f.getColumnIndex(const_cast<char*>("Time")) == 0);
-   const int32_t page_id = 1;
+   int page_count = SDDS_ReadPage(&SDDS_dataset);
+   assert(page_count == 1);
 
-   const cdev_time_t file_starttime = f.getParameterInDouble(const_cast<char*>("FileStartTime"), page_id);
-   const double hole_value = f.getParameterInDouble(const_cast<char*>("HoleValue"), page_id);
-   const int32_t column_count = f.getColumnCount();
-   const int32_t row_count = f.rowCount(page_id);
+   double file_starttime, hole_value;
+   SDDS_GetParameterAsDouble(&SDDS_dataset, const_cast<char*>("FileStartTime"), &file_starttime);
+   SDDS_GetParameterAsDouble(&SDDS_dataset, const_cast<char*>("HoleValue"), &hole_value);
+
    if (fabs(file_starttime - file.timestamp) > 60*30)
    {
       throw "Inconsistent FileStartTime. Wrong time zone?";
    }
 
-   vector<int> time_col_map = make_time_column_map(f);
+   const int32_t row_count = SDDS_RowCount(&SDDS_dataset);
+   int32_t column_count;
+   char **col_name_arr = SDDS_GetColumnNames(&SDDS_dataset, &column_count);
+
+   assert(strcmp(col_name_arr[0], "Time") == 0);
+
+   vector<int> time_col_map = make_time_column_map(col_name_arr, &SDDS_dataset);
 
    for(int32_t col = 1; col < column_count; col++) // start at 1 to skip time column
    {
@@ -116,9 +123,10 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
       {
          continue;
       }
-      double *time = f.getColumnInDouble(time_col_index, page_id);
-      double *values = f.getColumnInDouble(col, page_id);
-      map<cdev_time_t, double> &col_result = (*result)[f.getColumnName(col)];
+      char *col_name = col_name_arr[col];
+      boost::scoped_array<double> time(SDDS_GetColumnInDoubles(&SDDS_dataset, col_name_arr[time_col_index]));
+      boost::scoped_array<double> values(SDDS_GetColumnInDoubles(&SDDS_dataset, col_name));
+      map<cdev_time_t, double> &col_result = (*result)[col_name];
 
       for(int32_t row = 0; row < row_count; row++)
       {
@@ -133,7 +141,11 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
             col_result[row_time] = value;
          }
       }
+      SDDS_Free(col_name);
    }
+
+   SDDS_Free(col_name_arr);
+   SDDS_Terminate(&SDDS_dataset);
 }
 
 DBPrivate::DBPrivate(const string &base_path)
