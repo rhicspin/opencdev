@@ -33,6 +33,17 @@ def fetch(conn, logreq):
     if not os.path.isdir(sqldump_dir):
         os.makedirs(sqldump_dir)
     with open(sqldump_path, "w") as fp:
+        fp.write("CREATE TABLE IF NOT EXISTS rhicFileHeaderV ("
+                "processId VARCHAR(255), "
+                "requestFile VARCHAR(255), "
+                "orgStartTime DATETIME, "
+                "timeStamp DATETIME, "
+                "stopTimeStamp DATETIME, "
+                "filePath VARCHAR(255), "
+                "fillNo INT, "
+                "stopFillNo INT, "
+                "comment VARCHAR(255)"
+                ");\n")
         for row in res:
             def show(val):
                 if isinstance(val, datetime.datetime):
