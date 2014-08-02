@@ -30,18 +30,21 @@ int main(void)
    }
    cout << endl;
 
-   const map<opencdev::cdev_time_t, double> &time_map = result.begin()->second;
-   for(map<opencdev::cdev_time_t, double>::const_iterator tit = time_map.begin(); tit != time_map.end(); tit++)
+   if (result.size() > 0)
    {
-      opencdev::cdev_time_t time = tit->first;
-      cout << time << "\t";
-      for(opencdev::result_t::const_iterator it = result.begin(); it != result.end(); it++)
+      const map<opencdev::cdev_time_t, double> &time_map = result.begin()->second;
+      for(map<opencdev::cdev_time_t, double>::const_iterator tit = time_map.begin(); tit != time_map.end(); tit++)
       {
-         const string &cell_name = it->first;
-         const map<opencdev::cdev_time_t, double> &values = it->second;
-         cout << values.at(time) << "\t";
+         opencdev::cdev_time_t time = tit->first;
+         cout << time << "\t";
+         for(opencdev::result_t::const_iterator it = result.begin(); it != result.end(); it++)
+         {
+            const string &cell_name = it->first;
+            const map<opencdev::cdev_time_t, double> &values = it->second;
+            cout << values.at(time) << "\t";
+         }
+         cout << endl;
       }
-      cout << endl;
    }
 
    return EXIT_SUCCESS;
