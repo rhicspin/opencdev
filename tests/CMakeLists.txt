@@ -6,6 +6,7 @@ ADD_EXECUTABLE(
 	unit_tests
 	unit_tests_main.cpp
 	copy.cpp
+	fill_query.cpp
 	timerange_query.cpp
 	)
 
@@ -20,6 +21,10 @@ TARGET_LINK_LIBRARIES(
 ADD_TEST(
 	NAME copy
 	COMMAND $<TARGET_FILE:unit_tests> --run_test=copy
+	)
+ADD_TEST(
+	NAME fill_query
+	COMMAND $<TARGET_FILE:unit_tests> --run_test=fill_query
 	)
 ADD_TEST(
 	NAME timerange_query
