@@ -53,7 +53,7 @@ def fetch(conn, logreq):
                 else:
                     return repr(val)
             values = ", ".join(map(show, row))
-            query = "INSERT INTO rhicFileHeaderV (%s) VALUES (%s)" % (fields, values)
+            query = "INSERT INTO rhicFileHeaderV (%s) VALUES (%s);" % (fields, values)
             fp.write("%s\n" % query)
 
     print "  [*] Copying SDDS files ..."
