@@ -7,6 +7,7 @@ ADD_EXECUTABLE(
 	unit_tests_main.cpp
 	copy.cpp
 	fill_query.cpp
+	sdds.cpp
 	timerange_query.cpp
 	)
 
@@ -25,6 +26,10 @@ ADD_TEST(
 ADD_TEST(
 	NAME fill_query
 	COMMAND $<TARGET_FILE:unit_tests> --run_test=fill_query
+	)
+ADD_TEST(
+	NAME sdds
+	COMMAND $<TARGET_FILE:unit_tests> --run_test=sdds
 	)
 ADD_TEST(
 	NAME timerange_query
