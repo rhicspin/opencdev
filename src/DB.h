@@ -24,8 +24,8 @@ public:
    ~DB();
    void query_fill(const std::string &logger, int fill_id, result_t *result);
    /**
-    * @param starttime  UNIX timestamp in NYC timezone
-    * @param endtime    UNIX timestamp in NYC timezone
+    * @param starttime  UNIX timestamp in UTC
+    * @param endtime    UNIX timestamp in UTC
     */
    void query_timerange(const std::string &logger, cdev_time_t starttime, cdev_time_t endtime, result_t *result);
 };

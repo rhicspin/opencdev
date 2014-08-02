@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_CASE(check_load)
    using namespace boost::posix_time;
    using namespace boost::gregorian;
 
-   ptime t1(date(2013, Mar, 10), time_duration(9, 15, 0));
-   ptime t2(date(2013, Mar, 10), time_duration(9, 16, 0));
+   ptime t1(date(2013, Mar, 10), time_duration(13, 15, 0));
+   ptime t2(date(2013, Mar, 10), time_duration(13, 16, 0));
    const double ticks_per_second =
       time_duration::rep_type::ticks_per_second;
    ptime unix_epoch(boost::gregorian::date(1970,1,1));
@@ -42,6 +42,8 @@ BOOST_AUTO_TEST_CASE(check_load)
     *  -logger 'RHIC/Polarimeter/Yellow/biasReadbacks' \
     *  -timeformat 'unix' -showmissingdatawith x \
     *  -start 'Sun Mar 10 09:15:00 2013' -stop 'Sun Mar 10 09:16:00 2013'
+    *
+    *  Note that exportLoggerData accepts NY time, while we work in UTC
     */
    const int reference_column_count = 12;
    const double reference_time = 1362921351.449;

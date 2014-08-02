@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 
 import Sybase
+import pytz
 
 
 CAD_HOST = "acnlina5.pbn.bnl.gov"
@@ -47,7 +48,11 @@ def fetch(conn, logreq):
         for row in res:
             def show(val):
                 if isinstance(val, datetime.datetime):
-                    return "'%s'" % val.isoformat(" ")
+                    # First, we add TZ info to 'naive' datetime object
+                    ny_val = pytz.timezone("America/New_York").localize(val)
+                    # Second, convert time value to UTC
+                    utc_val = ny_val.astimezone(pytz.utc)
+                    return "'%s'" % utc_val.isoformat(" ")
                 if val is None:
                     return "NULL"
                 else:
