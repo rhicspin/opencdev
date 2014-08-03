@@ -114,4 +114,24 @@ BOOST_AUTO_TEST_CASE(check_query)
    }
 }
 
+BOOST_AUTO_TEST_CASE(check_query_mean)
+{
+   opencdev::LocalLogReader log_reader(TEST_DATA_PATH);
+   opencdev::mean_result_t result;
+
+   log_reader.query_timerange_mean("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", starttime, endtime, &result);
+
+   BOOST_CHECK_EQUAL(result.size(), reference_column_count);
+
+   for(opencdev::mean_result_t::const_iterator it = result.begin(); it != result.end(); it++)
+   {
+      const string &cell_name = it->first;
+      double value = it->second;
+
+      int cell_id = find_cell(cell_name);
+      BOOST_CHECK(cell_id >= 0);
+      BOOST_CHECK(fabs(value - reference_values[cell_id]) < epsilon);
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
