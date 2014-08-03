@@ -15,9 +15,9 @@ using std::endl;
 
 int main(void)
 {
-   opencdev::DB db("/star/u/veprbl/run_fy13");
+   opencdev::LocalLogReader log_reader("/star/u/veprbl/run_fy13");
    opencdev::result_t result;
-   db.query_fill("RHIC/Polarimeter/Blue/biasReadbacks.logreq", 17104, &result);
+   log_reader.query_fill("RHIC/Polarimeter/Blue/biasReadbacks.logreq", 17104, &result);
 
    cout << std::fixed << std::setprecision(1);
 

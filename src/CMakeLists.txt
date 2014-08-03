@@ -5,8 +5,9 @@ INCLUDE_DIRECTORIES(${SDDS_INCLUDE_DIR})
 ADD_LIBRARY(
 	opencdev
 	SHARED
-	DB.cxx
-	DB_p.cxx
+	LocalLogReader.cxx
+	LocalLogReader_p.cxx
+	LogReader.cxx
 	SqliteDriver.cxx
 	)
 

@@ -10,9 +10,10 @@ namespace opencdev {
 
 typedef double cdev_time_t;
 typedef std::map<std::string, std::map<cdev_time_t, double> > result_t;
+typedef std::map<std::string, double> mean_result_t;
 
 }
 
-#include "DB.h"
+#include "LocalLogReader.h"
 
 #endif

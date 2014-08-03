@@ -1,7 +1,7 @@
 /* vim: set sw=3: */
 
-#ifndef _DB_P_H
-#define _DB_P_H
+#ifndef _LOCAL_LOG_READER_P_H
+#define _LOCAL_LOG_READER_P_H
 
 #include <string>
 
@@ -17,7 +17,7 @@ namespace opencdev {
 const string CAD_SDDS_BASE = "/operations/app_store/RunData/run_fy13";
 const string CAD_LOGREQ_BASE = "/operations/app_store/Gpm";
 
-class DBPrivate
+class LocalLogReaderPrivate
 {
 private:
 
@@ -33,7 +33,7 @@ private:
 
 public:
 
-   DBPrivate(const string &base_path);
+   LocalLogReaderPrivate(const string &base_path);
    void query_fill(const string &logger, int fill_id, result_t *result);
    void query_timerange(const string &logger, cdev_time_t starttime, cdev_time_t endtime, result_t *result);
 };

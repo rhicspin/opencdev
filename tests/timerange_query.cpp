@@ -15,12 +15,12 @@ BOOST_AUTO_TEST_SUITE(timerange_query)
 
 BOOST_AUTO_TEST_CASE(check_load_fail)
 {
-   BOOST_CHECK_THROW(opencdev::DB db("/this/does/not/exist"), const char*); 
+   BOOST_CHECK_THROW(opencdev::LocalLogReader log_reader("/this/does/not/exist"), const char*);
 }
 
 BOOST_AUTO_TEST_CASE(check_load)
 {
-   opencdev::DB db(TEST_DATA_PATH);
+   opencdev::LocalLogReader log_reader(TEST_DATA_PATH);
    opencdev::result_t result;
 
    using namespace boost::posix_time;
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(check_load)
    double t1v = (t1 - unix_epoch).ticks() / ticks_per_second;
    double t2v = (t2 - unix_epoch).ticks() / ticks_per_second;
 
-   db.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", t1v, t2v, &result);
+   log_reader.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", t1v, t2v, &result);
 
    /*
     * Obtained by running

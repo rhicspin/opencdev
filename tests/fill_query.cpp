@@ -14,10 +14,10 @@ BOOST_AUTO_TEST_SUITE(fill_query)
 
 BOOST_AUTO_TEST_CASE(check_load)
 {
-   opencdev::DB db(TEST_DATA_PATH);
+   opencdev::LocalLogReader log_reader(TEST_DATA_PATH);
    opencdev::result_t result;
 
-   db.query_fill("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", 17201, &result);
+   log_reader.query_fill("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", 17201, &result);
 
    /*
     * Obtained by running

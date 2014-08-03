@@ -9,7 +9,7 @@
 #include <SDDS.h>
 
 #include "opencdev.h"
-#include "DB_p.h"
+#include "LocalLogReader_p.h"
 #include "SqliteDriver.h"
 
 using std::map;
@@ -18,17 +18,17 @@ namespace fs = boost::filesystem;
 
 namespace opencdev {
 
-string  DBPrivate::get_logreq_path(const string &logger)
+string  LocalLogReaderPrivate::get_logreq_path(const string &logger)
 {
    return (fs::path(CAD_LOGREQ_BASE)/fs::path(logger)).string();
 }
 
-string  DBPrivate::get_sdds_path(const string &rel_path)
+string  LocalLogReaderPrivate::get_sdds_path(const string &rel_path)
 {
    return (fs::path(_base_path)/fs::path(rel_path)).string();
 }
 
-void    DBPrivate::read_sdds_files(const vector<file_rec_t> &files, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
+void    LocalLogReaderPrivate::read_sdds_files(const vector<file_rec_t> &files, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
 {
    for(vector<file_rec_t>::const_iterator it = files.begin(); it != files.end(); it++)
    {
@@ -43,7 +43,7 @@ void    DBPrivate::read_sdds_files(const vector<file_rec_t> &files, result_t *re
  *
  * This should work when sddsIOFileType == "SDDSIO_LOG_VTf"
  */
-vector<int>    DBPrivate::make_time_column_map(char **col_name_arr, SDDS_DATASET *SDDS_dataset_ptr)
+vector<int>    LocalLogReaderPrivate::make_time_column_map(char **col_name_arr, SDDS_DATASET *SDDS_dataset_ptr)
 {
    const int32_t column_count = SDDS_ColumnCount(SDDS_dataset_ptr);
    vector<int> result;
@@ -73,7 +73,7 @@ vector<int>    DBPrivate::make_time_column_map(char **col_name_arr, SDDS_DATASET
    return result;
 }
 
-void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
+void    LocalLogReaderPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev_time_t starttime, cdev_time_t endtime)
 {
    const string &orig_path = file.path;
    if (orig_path.find(CAD_SDDS_BASE) != 0)
@@ -149,21 +149,21 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
    SDDS_Terminate(&SDDS_dataset);
 }
 
-DBPrivate::DBPrivate(const string &base_path)
+LocalLogReaderPrivate::LocalLogReaderPrivate(const string &base_path)
    : _base_path(base_path)
    , _db((fs::path(_base_path)/"db.sqlite").string())
 {
    // Nothing
 }
 
-void    DBPrivate::query_fill(const string &logger, int fill_id, result_t *result)
+void    LocalLogReaderPrivate::query_fill(const string &logger, int fill_id, result_t *result)
 {
    vector<file_rec_t> files = _db.get_fill_files(get_logreq_path(logger), fill_id);
    
    read_sdds_files(files, result, 0, 0);
 }
 
-void    DBPrivate::query_timerange(const string &logger, cdev_time_t starttime, cdev_time_t endtime, result_t *result)
+void    LocalLogReaderPrivate::query_timerange(const string &logger, cdev_time_t starttime, cdev_time_t endtime, result_t *result)
 {
    vector<file_rec_t> files = _db.get_timerange_files(get_logreq_path(logger), starttime, endtime);
 
