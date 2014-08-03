@@ -14,11 +14,11 @@ BOOST_AUTO_TEST_CASE(double_free_test)
 
    {
        opencdev::LocalLogReader log_reader2(log_reader);
-       log_reader2.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", 0, 1, &result);
+       log_reader2.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks", 0, 1, &result);
        BOOST_CHECK(result.size() == 0);
    }
 
-   log_reader.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", 0, 1, &result);
+   log_reader.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks", 0, 1, &result);
    BOOST_CHECK(result.size() == 0);
 }
 

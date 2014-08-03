@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(check_load)
    opencdev::LocalLogReader log_reader(TEST_DATA_PATH);
    opencdev::result_t result;
 
-   log_reader.query_fill("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", 17201, &result);
+   log_reader.query_fill("RHIC/Polarimeter/Yellow/biasReadbacks", 17201, &result);
 
    /*
     * Obtained by running

@@ -20,7 +20,7 @@ namespace opencdev {
 
 string  LocalLogReaderPrivate::get_logreq_path(const string &logger)
 {
-   return (fs::path(CAD_LOGREQ_BASE)/fs::path(logger)).string();
+   return (fs::path(CAD_LOGREQ_BASE)/fs::path(logger + ".logreq")).string();
 }
 
 string  LocalLogReaderPrivate::get_sdds_path(const string &rel_path)

@@ -17,7 +17,7 @@ int main(void)
 {
    opencdev::LocalLogReader log_reader("/star/u/veprbl/run_fy13");
    opencdev::result_t result;
-   log_reader.query_fill("RHIC/Polarimeter/Blue/biasReadbacks.logreq", 17104, &result);
+   log_reader.query_fill("RHIC/Polarimeter/Blue/biasReadbacks", 17104, &result);
 
    cout << std::fixed << std::setprecision(1);
 

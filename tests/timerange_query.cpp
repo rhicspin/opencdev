@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(check_query)
    opencdev::LocalLogReader log_reader(TEST_DATA_PATH);
    opencdev::result_t result;
 
-   log_reader.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", starttime, endtime, &result);
+   log_reader.query_timerange("RHIC/Polarimeter/Yellow/biasReadbacks", starttime, endtime, &result);
 
    BOOST_CHECK_EQUAL(result.size(), reference_column_count);
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(check_query_mean)
    opencdev::LocalLogReader log_reader(TEST_DATA_PATH);
    opencdev::mean_result_t result;
 
-   log_reader.query_timerange_mean("RHIC/Polarimeter/Yellow/biasReadbacks.logreq", starttime, endtime, &result);
+   log_reader.query_timerange_mean("RHIC/Polarimeter/Yellow/biasReadbacks", starttime, endtime, &result);
 
    BOOST_CHECK_EQUAL(result.size(), reference_column_count);
 
