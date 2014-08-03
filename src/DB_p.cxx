@@ -140,11 +140,11 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
             col_result[row_time] = value;
          }
       }
-      SDDS_Free(col_name);
       SDDS_Free(time);
       SDDS_Free(values);
    }
 
+   SDDS_FreeStringArray(col_name_arr, column_count);
    SDDS_Free(col_name_arr);
    SDDS_Terminate(&SDDS_dataset);
 }
