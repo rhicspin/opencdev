@@ -4,7 +4,6 @@
 #include <cstring>
 #include <cmath>
 
-#include <boost/scoped_array.hpp>
 #include <boost/filesystem.hpp>
 
 #include <SDDS.h>
@@ -124,8 +123,8 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
          continue;
       }
       char *col_name = col_name_arr[col];
-      boost::scoped_array<double> time(SDDS_GetColumnInDoubles(&SDDS_dataset, col_name_arr[time_col_index]));
-      boost::scoped_array<double> values(SDDS_GetColumnInDoubles(&SDDS_dataset, col_name));
+      double* time = SDDS_GetColumnInDoubles(&SDDS_dataset, col_name_arr[time_col_index]);
+      double* values= SDDS_GetColumnInDoubles(&SDDS_dataset, col_name);
       map<cdev_time_t, double> &col_result = (*result)[col_name];
 
       for(int32_t row = 0; row < row_count; row++)
@@ -142,6 +141,8 @@ void    DBPrivate::read_sdds_file(const file_rec_t &file, result_t *result, cdev
          }
       }
       SDDS_Free(col_name);
+      SDDS_Free(time);
+      SDDS_Free(values);
    }
 
    SDDS_Free(col_name_arr);
