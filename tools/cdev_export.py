@@ -77,3 +77,7 @@ if __name__ == '__main__':
     conn = Sybase.connect("localhost:5000", "harmless", "harmless", "run_fy13_fill", outputmap = Sybase.DateTimeAsPython)
     fetch(conn, "RHIC/Polarimeter/Yellow/biasReadbacks")
     fetch(conn, "RHIC/Polarimeter/Blue/biasReadbacks")
+    fetch(conn, "RHIC/BeamIons")
+    fetch(conn, "RHIC/Rf/Voltage_Monitor_StripChart")
+    fetch(conn, "RHIC/PowerSupplies/rot-ps")
+    fetch(conn, "RHIC/PowerSupplies/snake-ps")
