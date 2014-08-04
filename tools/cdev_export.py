@@ -25,6 +25,8 @@ def fetch(conn, logreq):
     assert(logreq_full.find("'") == -1)
     cur.execute("SELECT * FROM rhicFileHeaderV WHERE requestFile = '%s'" % logreq_full)
     res = cur.fetchall()
+    if len(res) == 0:
+       raise Exception("Received no metadata. Wrong logger?")
     field_list = map(lambda x: x[0], cur.description)
     fields = ", ".join(field_list)
 
