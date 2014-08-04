@@ -20,7 +20,7 @@ def fetch(conn, logreq):
     print " [>] %s" % logreq
     print "  [*] Fetching metadata ..."
     cur = conn.cursor()
-    logreq_full = os.path.join(CAD_LOGREQ_BASE, logreq)
+    logreq_full = os.path.join(CAD_LOGREQ_BASE, logreq) + ".logreq"
     #cur.execute("SELECT * FROM rhicFileHeaderV WHERE requestFile = @name", {'@name': logreq_full})
     assert(logreq_full.find("'") == -1)
     cur.execute("SELECT * FROM rhicFileHeaderV WHERE requestFile = '%s'" % logreq_full)
@@ -75,5 +75,5 @@ def fetch(conn, logreq):
 if __name__ == '__main__':
     print " [*] Connecting to the database ..."
     conn = Sybase.connect("localhost:5000", "harmless", "harmless", "run_fy13_fill", outputmap = Sybase.DateTimeAsPython)
-    fetch(conn, "RHIC/Polarimeter/Yellow/biasReadbacks.logreq")
-    fetch(conn, "RHIC/Polarimeter/Blue/biasReadbacks.logreq")
+    fetch(conn, "RHIC/Polarimeter/Yellow/biasReadbacks")
+    fetch(conn, "RHIC/Polarimeter/Blue/biasReadbacks")
