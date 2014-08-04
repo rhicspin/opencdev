@@ -14,7 +14,7 @@ using std::string;
 
 namespace opencdev {
 
-const string CAD_SDDS_BASE = "/operations/app_store/RunData/run_fy13";
+const string CAD_SDDS_BASE = "/operations/app_store/RunData";
 const string CAD_LOGREQ_BASE = "/operations/app_store/Gpm";
 
 class LocalLogReaderPrivate
