@@ -6,6 +6,7 @@ import os
 import subprocess
 import tempfile
 
+os.environ["TDSVER"] = "5.0"
 import Sybase
 import pytz
 
