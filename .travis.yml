@@ -1,7 +1,12 @@
+sudo: false
 language: cpp
+addons:
+  apt:
+    packages:
+      - libboost-dev
+      - libboost-filesystem-dev
+      - libboost-test-dev
 before_script:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libboost-dev libboost-filesystem-dev libboost-test-dev
   - mkdir build
   - cd build
   - cmake ..
