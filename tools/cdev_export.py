@@ -11,7 +11,7 @@ import Sybase
 import pytz
 
 
-CAD_HOST = "acnlina5.pbn.bnl.gov"
+CAD_HOST = "yellowpc"
 CAD_SDDS_BASE = "/operations/app_store/RunData"
 CAD_LOGREQ_BASE = "/operations/app_store/Gpm"
 OUTPUT_DIR = "./"
