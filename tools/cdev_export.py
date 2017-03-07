@@ -73,7 +73,7 @@ def fetch(conn, logreq):
             local_path = remote_path[len(CAD_SDDS_BASE):]
             filelist.write("%s\n" % local_path)
         filelist.flush()
-        subprocess.call(["rsync", "-ptgo", "--files-from=%s" % filelist.name, "%s:%s" % (CAD_HOST, CAD_SDDS_BASE), OUTPUT_DIR])
+        subprocess.call(["rsync", "-ptgov", "--files-from=%s" % filelist.name, "%s:%s" % (CAD_HOST, CAD_SDDS_BASE), OUTPUT_DIR])
 
 if __name__ == '__main__':
     print " [*] Connecting to the database ..."
