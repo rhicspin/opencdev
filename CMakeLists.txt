@@ -21,7 +21,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR})
 SET(Boost_NO_BOOST_CMAKE ON)
 
 FIND_PACKAGE(Sqlite3)
-FIND_PACKAGE(Boost 1.41 REQUIRED filesystem unit_test_framework)
+FIND_PACKAGE(Boost 1.41 REQUIRED system filesystem unit_test_framework)
 
 ADD_SUBDIRECTORY(contrib)
 ADD_SUBDIRECTORY(src)
